@@ -16,3 +16,5 @@ foreach ($ADGroup in $ADGroups)
     Write-Host ""
     }
     Clear-Variable ADGroup
+    
+    Test
