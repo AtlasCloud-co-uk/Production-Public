@@ -75,3 +75,4 @@ $Compare1
 
 
 Remove-Variable * -ErrorAction SilentlyContinue
+Added test comments
