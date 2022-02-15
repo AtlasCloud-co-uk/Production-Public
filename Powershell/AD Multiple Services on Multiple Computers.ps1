@@ -73,22 +73,22 @@ $header = @"
 "@
 
 
-#Set New line using OFS special Powershell variable
+# Set New line using OFS special Powershell variable
 
 $OFS = "`n"
 
-#Externally set input value as string
+# Externally set input value as string
 
-[string[]] $_ServerList= @()
+[string[]] $_ServiceList= @()
 
-#Get the input from the user
+# Get the input from the user
 
-$_ServerList = READ-HOST "Enter Services Name/s (Add stars for wildcard: Example *print*)"
+$_ServiceList = READ-HOST "Enter Services Name/s split each service name using ; (Add stars for wildcard: Example *print*)"
 
-#splitting the list of input as array by Comma & Empty Space
+# Splitting the list of input as array by Comma & Empty Space
 
-$_ServerList = $_ServerList.Split(',').Split(' ')
-$Services = $_ServerList + $OFS
+$_ServiceList = $_ServiceList.Split(',').Split(';')
+$Services = $_ServiceList + $OFS
 $Services
 
 
@@ -100,7 +100,7 @@ Write-Host "Selected Computer/s: " $ComputerSelect.Name
 Write-Host "----------"
 Write-Host "Processing Request"
 
-#Search for sevices on Selected Machine/s (non-terminating Error Messages Silenced)
+# Search for sevices on Selected Machine/s (non-terminating Error Messages Silenced)
 
 <#
 Creates an ArrayList for the Catch $errs in the ForEach.
@@ -112,7 +112,7 @@ $errs = New-Object System.Collections.ArrayList($null)
 $ADComputers = $ComputerSelect.Name | Sort-Object
 $OutputLoop = ForEach ($ADC in $ADComputers)
 {
-$ServiceList = $null
+$ServerList = $null
   Try 
     {
     $ServiceList = Get-Service -Name $Services -ComputerName $ADC -ErrorAction SilentlyContinue | Select-Object -Property MachineName,Name,DisplayName,Status | Sort-Object 
@@ -132,8 +132,7 @@ $ServiceList = $null
     }
 }
 
-
-#Output results as a HTML Report
+# Output results as a HTML Report
 
 $htmlreport1 = $OutputLoop | Convertto-html -Property MachineName,Name,DisplayName,Status -Fragment -PreContent "<h1>Services</h1>"
 $htmlreport1 = $htmlreport1 -replace '<td>Running</td>','<td class="RunningStatus">Running</td>' 
@@ -143,5 +142,5 @@ $report = convertto-html -Body "$htmlreport1 $htmlreport2" -Title "ADMultipleSer
 $report | out-file .\ADMultipleServicesMachines.html
 Invoke-Expression .\ADMultipleServicesMachines.html
 
-#Clears the Variables, this stops any issue with the variables bring back any previous held information
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue

@@ -20,5 +20,5 @@ $ProcessStartTime =invoke-command -session $sess -ScriptBlock{ (Get-Process -Id 
 
 Write-Host "Start Time: " $ProcessStartTime
 
-
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue

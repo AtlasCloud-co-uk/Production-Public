@@ -17,5 +17,5 @@ Write-Host "Event : " $EventNameSelect.Id
 $GetLogEvent = Get-WinEvent -LogName Application -ComputerName $ComputerSelect.Name | Where-Object ID -eq $EventNameSelect.Id
 $GetLogEvent
 
-# Clears all the variables
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue

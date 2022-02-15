@@ -45,5 +45,5 @@ foreach ($Computer in $Computers)
     }
     $Output | Sort-Object TimeCreated | Out-GridView -Title "Select Event List"
 
-# Clear all variables
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue

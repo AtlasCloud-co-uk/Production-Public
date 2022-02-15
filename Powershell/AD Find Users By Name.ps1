@@ -1,11 +1,11 @@
-#Obtain user name
+# Obtain user name
 
 $User = Read-Host -Prompt "Name (Example: john | john glen | *glen)" 
 
 #Find the user and display the 
 $ListADUSers = get-aduser -Filter "Name -like '$User*'" -Properties Name,LastLogonDate,Description,Created,CanonicalName | select-object -Property name,enabled,lastlogondate,CanonicalName
 
-#If Statement used to Display a message if no user is found
+# If Statement used to Display a message if no user is found
 if ($ListADUsers)
 {
     Write-OutPut $ListADUsers | Out-host
@@ -55,6 +55,7 @@ if ($ListADUsers)
         }
      Else
      {
+     # Clears the Variables, this stops any issue with the variables bring back any previous held information
      Remove-Variable * -ErrorAction SilentlyContinue
      Write-Host "No CSV required" -ForegroundColor Green
      }

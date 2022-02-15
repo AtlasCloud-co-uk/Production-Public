@@ -8,15 +8,15 @@ If a folder is missing, it will not show an extension on the name and the files 
 
 #>
 
-#Select First Machine
+# Select First Machine
 $ComputerList = Get-ADComputer -Filter * -Properties Name,DistinguishedName | Sort-Object | Select-Object -Property Name,DistinguishedName
 $ComputerSelect1 = $ComputerList | Out-GridView -Title "Select First Computer Name and Click OK" -OutputMode Single
 Write-Host "Computer 1: " $ComputerSelect1.Name
 
-#Enter First Directory Path
+# Enter First Directory Path
 $DirectoryPathToScan1 = Read-Host -Prompt "Path"
 
-#Test Directory Path is valid
+# Test Directory Path is valid
 $TestPath = Invoke-command -ComputerName $ComputerSelect1.Name -scriptBlock {
 Test-Path -Path $args[0]
 } -ArgumentList $DirectoryPathToScan1
@@ -31,12 +31,12 @@ Remove-Variable * -ErrorAction SilentlyContinue
 Exit
 }
 
-#Select Second Machine
+# Select Second Machine
 $ComputerList = Get-ADComputer -Filter * -Properties Name,DistinguishedName | Sort-Object | Select-Object -Property Name,DistinguishedName
 $ComputerSelect2 = $ComputerList | Out-GridView -Title "Select Second Computer Name and Click OK" -OutputMode Single
 Write-Host "Computer 2: " $ComputerSelect2.Name
 
-#Enter Second Directory Path
+# Enter Second Directory Path
 $DirectoryPathToScan2 = Read-Host -Prompt "Path (Or Press Enter to use the same Path)"
 
 # Message Filter Defaul Input if nothing enter
@@ -48,7 +48,7 @@ $DirectoryPathToScan2 = $DirectoryPathToScan1
 
 }
 
-#Test Directory Path is valid
+# Test Directory Path is valid
 $TestPath = Invoke-command -ComputerName $ComputerSelect2.Name -scriptBlock {
 Test-Path -Path $args[0]
 } -ArgumentList $DirectoryPathToScan2
@@ -73,5 +73,5 @@ $SecondFolder = invoke-command -ComputerName $ComputerSelect2.Name -scriptblock 
 $Compare1 = Compare-Object -ReferenceObject $FirstFolder -DifferenceObject $SecondFolder -Property Name | Select-Object -property *
 $Compare1
 
-
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue

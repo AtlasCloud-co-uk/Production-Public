@@ -61,4 +61,6 @@ if ($length -ge $MinimumPathLengthsToShow)
         $filePathsAndLengths.Add($_) > $null
     }
 }
+
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue 

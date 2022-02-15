@@ -33,5 +33,5 @@ ForEach ($ADC in $ComputerSelect)
 }
 }
 
-#Clears the Variables, this stops any issue with the variables bring back any previous held information
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue
