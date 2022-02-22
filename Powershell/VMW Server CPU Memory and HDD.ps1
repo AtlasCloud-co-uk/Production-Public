@@ -50,7 +50,7 @@ $tbl | out-gridview -Title "VSphere Server CPU, Memory and HDD"
 
 #Select if want to save as CSV
 
-if ($Output)
+if ($tbl)
 {
     $Export = Read-Host -Prompt "Would you like to save as a CSV? Y/N (Default is N)"
         if ($Export -eq 'y')
