@@ -11,7 +11,7 @@ $ADUsers = Get-ADUser -SearchBase $OU.DistinguishedName -Filter * -Properties SS
 $Output = foreach ($ADuser in $ADUsers){
 if ($ADUser.ssprq -eq $Null)
 {
-   Write-Host $ADUser.name "is NOT registered for SSPR." -ForegroundColor Red
+   Write-Host $ADUser.name $ADUser.Enabled "is NOT registered for SSPR." -ForegroundColor Red
 }
 else
 {
