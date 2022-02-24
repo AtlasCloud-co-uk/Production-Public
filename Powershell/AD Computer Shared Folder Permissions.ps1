@@ -1,4 +1,4 @@
-Function Get-LHSsharedFolderNTFSPermission
+﻿Function Get-LHSsharedFolderNTFSPermission
 {
 <#
 .SYNOPSIS
