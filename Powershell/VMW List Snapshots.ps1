@@ -7,7 +7,7 @@ $VSphereServerImport = Import-Csv -Path "C:\Powershell Scripts\CSV\VMServers.csv
 # Import Modue vmware viautomation core 
 Import-Module vmware.vimautomation.core
 
-# Connect to teh VMWare server and pulls back the snapsots into a grid-view
+# Connect to the VMWare server and pulls back the snapsots into a grid-view
 Connect-VIServer $VSphereServerImport.Server
 $SnapShotList = Get-VM | Get-SnapShot | Select Created, VM, Name, Description, SizeGB
 $SnapShotCount = $SnapShotList | Measure
