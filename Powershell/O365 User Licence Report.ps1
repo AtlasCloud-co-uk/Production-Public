@@ -1,4 +1,4 @@
-﻿# Create a table
+# Create a table
 
 $tbl = New-Object System.Data.DataTable "Data"
 $col1 = New-Object System.Data.DataColumn AccountSkuId
