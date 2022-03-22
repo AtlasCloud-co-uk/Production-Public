@@ -1,4 +1,4 @@
-﻿# Load Citrix PowerShell modules
+# Load Citrix PowerShell modules
 Asnp Citrix.*
 
 # Load Citirx Broker
