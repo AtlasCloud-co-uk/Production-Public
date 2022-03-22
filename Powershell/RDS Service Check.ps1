@@ -1,4 +1,4 @@
-﻿# Import Selected Environment
+# Import Selected Environment
 $RDSServerImportENV = Import-Csv -Path "C:\Powershell Scripts\CSV\SelectENV.csv"
 
 # Select Environment
