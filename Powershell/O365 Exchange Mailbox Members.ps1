@@ -1,4 +1,4 @@
-﻿# Connect to Exchange
+# Connect to Exchange
 Connect-ExchangeOnline -ShowBanner:$false
 
 # Get Exchange Mailboxes
