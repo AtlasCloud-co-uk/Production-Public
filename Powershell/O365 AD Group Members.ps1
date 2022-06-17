@@ -9,7 +9,10 @@ $tbl.Columns.Add($col1)
 $tbl.Columns.Add($col2)
 $tbl.Columns.Add($col3)
 $tbl.Columns.Add($col4)
- 
+
+# Import MSOnline
+Import-Module MSOnline
+
 # Connect to AD Service
 Connect-MsolService
 
