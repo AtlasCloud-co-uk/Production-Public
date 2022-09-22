@@ -1,4 +1,4 @@
-﻿<#
+<#
     .SYNOPSIS
         Automatically installs the Company Portal app
         Most of this code is is by Oliver Kieselbach from his excellent blog post
