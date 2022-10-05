@@ -277,7 +277,7 @@ $AtlasFilterTableHTML = "$AtlasFilterTitle <p></p>
  $ExtensionAttributehtmlcode2<p></p>
  $AtlasAttributeCountTotalHTML2 <p></p>
  $AtlasFilterGetMissingUserHTML2"
- $AtlasFilterTableButton2 = "<h2>Total Users (exc Atlas Cloud Ltd): <h4>$($AtlasAllConfirmTotalMatch2)</h4>  </h2><button type='button' class='collapsible'><h3>+</h3></button> <div class='content'> <p>$AtlasFilterTableHTML</p> </div>"
+ $AtlasFilterTableButton2 = "<h2>Total Users (Atlas Cloud Ltd Only): <h4>$($AtlasAllConfirmTotalMatch2)</h4>  </h2><button type='button' class='collapsible'><h3>+</h3></button> <div class='content'> <p>$AtlasFilterTableHTML</p> </div>"
  
 # Login Days Count
 
