@@ -1,13 +1,28 @@
-﻿## Initialize vars
-$ScriptStartDate = Get-Date
-$ScriptStartTime = Get-Date | Select-Object -ExpandProperty DateTime
-$DaysToDelete = 7
-$CleanmgrWaitTimeInSeconds = 300 # needs to be a double
-$CleanmgrWaitTimeInMinutes = 5.0
-$DismWaitTimeInSeconds = 300 # needs to be a double
-$DismWaitTimeInMinutes = 5.0 # needs to be a double
-$VerbosePreference = "Continue"
-$ErrorActionPreference = "SilentlyContinue"
+﻿
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $false,ValueFromPipelineByPropertyName)]
+        [double]
+        $CleanmgrTimeout = 5,
+
+        [Parameter(Mandatory = $false,ValueFromPipelineByPropertyName)]
+        [double]
+        $DismTimeout = 5,
+
+        [Parameter(Mandatory = $false,ValueFromPipelineByPropertyName)]
+        [bool]
+        $DismAdvanced = $false
+    )
+
+    ## Initialize vars
+    $ScriptStartDate = Get-Date
+    $ScriptStartTime = Get-Date | Select-Object -ExpandProperty DateTime
+    $DaysToDelete = 7
+    $CleanmgrWaitTimeInSeconds = ($CleanmgrTimeout * 60)
+    $DismWaitTimeInSeconds = ($DismTimeout * 60)
+    $VerbosePreference = "Continue"
+    $ErrorActionPreference = "SilentlyContinue"
+
 
 ## Check $VerbosePreference variable, and turns on
 Function global:Write-Verbose ( [string]$Message ) {
@@ -18,11 +33,16 @@ Function global:Write-Verbose ( [string]$Message ) {
 
 Write-Verbose @" 
 ################################################################################################################
-##                                    Starting 'Start-Cleanup.ps1' script                                     ##
+##                                           Starting cleanup script                                          ##
 ##                                          Please allow time to run.                                         ##
 ################################################################################################################
 
 Hostname:`t`t$($env:COMPUTERNAME)
+
+Options:
+Cleanmgr timeout:`t$CleanmgrTimeout mins
+Dism timeout:`t`t$DismTimeout mins
+Dism advanced cleanup:`t$DismAdvanced
 `n`n
 "@
 
@@ -87,7 +107,7 @@ Write-Host "All CBS logs have been removed successfully!`t`t`t`t`t`t`t`t" -NoNew
 Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
     Write-Host "C:\Windows\logs\CBS\ does not exist, there is nothing to cleanup.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans IIS Logs older then $DaysToDelete
@@ -99,7 +119,7 @@ if (Test-Path C:\inetpub\logs\LogFiles\) {
 }
 else {
     Write-Host "C:\inetpub\logs\LogFiles\ does not exist, there is nothing to cleanup.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Removes C:\Config.Msi
@@ -110,7 +130,7 @@ if (test-path C:\Config.Msi){
 
 } else {
     Write-Host "C:\Config.Msi does not exist, there is nothing to cleanup.`t`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Removes c:\Intel
@@ -120,7 +140,7 @@ if (test-path c:\Intel){
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
     Write-Host "C:\Intel does not exist, there is nothing to cleanup.`t`t`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Removes c:\PerfLogs
@@ -130,7 +150,7 @@ if (test-path c:\PerfLogs){
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
     Write-Host "C:\PerfLogs does not exist, there is nothing to cleanup.`t`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Removes $env:windir\memory.dmp
@@ -141,7 +161,7 @@ if (test-path $env:windir\memory.dmp){
     remove-item $env:windir\memory.dmp -force -ErrorAction SilentlyContinue
 } else {
     Write-Host "C:\Windows\memory.dmp does not exist, there is nothing to cleanup.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Removes Windows Error Reporting files
@@ -151,7 +171,7 @@ if (test-path C:\ProgramData\Microsoft\Windows\WER){
         Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
     } else {
         Write-Host "C:\ProgramData\Microsoft\Windows\WER does not exist, there is nothing to cleanup.`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Removes System and User Temp Files - lots of access denied will occur.
@@ -162,7 +182,7 @@ if (Test-Path $env:windir\Temp\) {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Windows\Temp does not exist, there is nothing to cleanup.`t`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up minidump
@@ -172,7 +192,7 @@ if (Test-Path $env:windir\minidump\) {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "$env:windir\minidump\ does not exist, there is nothing to cleanup.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up prefetch
@@ -182,7 +202,7 @@ if (Test-Path $env:windir\Prefetch\) {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "$env:windir\Prefetch\ does not exist, there is nothing to cleanup.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up each users temp folder
@@ -192,7 +212,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Temp\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Temp\ does not exist, there is nothing to cleanup.`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up all users windows error reporting
@@ -202,7 +222,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\WER\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\ProgramData\Microsoft\Windows\WER does not exist, there is nothing to cleanup.`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up users temporary internet files
@@ -212,7 +232,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\Temporary Internet Fil
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Windows\Temporary Internet Files\ does not exist.`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up Internet Explorer cache
@@ -222,7 +242,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\IECompatCache\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Windows\IECompatCache\ does not exist.`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up Internet Explorer cache
@@ -232,7 +252,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\IECompatUaCache\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Windows\IECompatUaCache\ does not exist.`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up Internet Explorer download history
@@ -242,7 +262,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\IEDownloadHistory\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Windows\IEDownloadHistory\ does not exist.`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up Internet Cache
@@ -252,7 +272,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\INetCache\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Windows\INetCache\ does not exist.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up Internet Cookies
@@ -262,7 +282,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Windows\INetCookies\") {
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Windows\INetCookies\ does not exist.`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Cleans up terminal server cache
@@ -272,7 +292,7 @@ if (Test-Path "C:\Users\*\AppData\Local\Microsoft\Terminal Server Client\Cache\"
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
         Write-Host "C:\Users\*\AppData\Local\Microsoft\Terminal Server Client\Cache\ does not exist.`t`t`t" -NoNewline -ForegroundColor DarkGray
-        Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+        Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 Write-host "Removing System and User Temp Files`t`t`t`t`t`t`t`t`t" -NoNewline -ForegroundColor Green
@@ -285,7 +305,7 @@ if (Test-path 'C:\$Recycle.Bin'){
     Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 } else {
     Write-Host "System recycle bin does not exist, there is nothing to cleanup.`t`t`t`t`t`t" -NoNewline -ForegroundColor DarkGray
-    Write-Host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
+    Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
 }
 
 ## Turns errors back on
@@ -328,10 +348,10 @@ Function Start-CleanMGR {
                     break
                 }
             }
-            if (((Get-Date) - $CleanmgrStartTime).TotalMinutes -ge $CleanmgrWaitTimeInMinutes){ # Kill cleanmgr after 5 mins of running
+            if (((Get-Date) - $CleanmgrStartTime).TotalMinutes -ge $CleanmgrTimeout){ # Kill cleanmgr after x mins of running
                 Get-Process -Name *cleanmgr* | Stop-Process -Force
-                Write-host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor Black
-                Write-Host "Cleanmgr ran for 5 mins, killed the process in case of hang. Maybe try to run again?" -ForegroundColor DarkYellow
+                Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor Black
+                Write-Host "Cleanmgr ran for $CleanmgrTimeout mins, killed the process in case of hang" -ForegroundColor DarkGray
                 break
             }
             if (-not (Get-Process -Name "cleanmgr"  -ErrorAction SilentlyContinue) ) {
@@ -343,13 +363,13 @@ Function Start-CleanMGR {
         Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\*' | ForEach-Object {
             New-ItemProperty -Path $_.PSPath -Name StateFlags0001 -Value 1 -PropertyType DWord -Force | Out-Null
            }
-        if (((Get-Date) - $CleanmgrStartTime).TotalMinutes -lt $CleanmgrWaitTimeInMinutes){
+        if (((Get-Date) - $CleanmgrStartTime).TotalMinutes -lt $CleanmgrTimeout){
             Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
         }
     }
     catch [System.Exception]{
         Write-host "Cannot locate cleanmgr.exe.`t`t`t`t`t`t`t`t`t`t" -ForegroundColor Red -NoNewline
-        Write-host "[ERROR]" -ForegroundColor Red -BackgroundColor black
+        Write-host "[ERROR]" -ForegroundColor Red -BackgroundColor Black
     }
 }
 Start-CleanMGR
@@ -357,7 +377,13 @@ Start-CleanMGR
 function Start-DismCleanup {
     try {
         Write-Host "Dism is cleaning up 'C:\Windows\WinSXS'.`t`t`t`t`t`t`t`t" -ForegroundColor Green -NoNewline
-        Start-Process -FilePath dism.exe -ArgumentList '/online /Cleanup-Image /StartComponentCleanup' -WindowStyle Hidden # removed /ResetBase
+
+        if ($DismAdvanced){ # if 1
+            Start-Process -FilePath dism.exe -ArgumentList '/online /Cleanup-Image /StartComponentCleanup /ResetBase' -WindowStyle Hidden
+        }else { # if 0
+            Start-Process -FilePath dism.exe -ArgumentList '/online /Cleanup-Image /StartComponentCleanup' -WindowStyle Hidden
+        }
+        
         $DismStartTime = Get-Date
         while (Get-Process -Name Dism -ErrorAction SilentlyContinue) {
             foreach($i in (1..$DismWaitTimeInSeconds)) {
@@ -370,17 +396,17 @@ function Start-DismCleanup {
                     break
                 }
             }
-            if (((Get-Date) - $DismStartTime).TotalMinutes -ge $DismWaitTimeInMinutes){ # Kill cleanmgr after 5 mins of running
+            if (((Get-Date) - $DismStartTime).TotalMinutes -ge $DismTimeout){ # Kill dism after x mins of running
                 Get-Process -Name *dism* | Stop-Process -Force
-                Write-host "[WARNING]" -ForegroundColor DarkYellow -BackgroundColor black
-                Write-Host "Dism ran for 5 mins, killed the process in case of hang. Maybe try to run again?" -ForegroundColor DarkYellow
+                Write-host "[INFO]" -ForegroundColor DarkGray -BackgroundColor black
+                Write-Host "Dism ran for $DismTimeout mins, killed the process in case of hang" -ForegroundColor DarkGray
                 break
             }
             if (-not (Get-Process -Name "dism" -ErrorAction SilentlyContinue) ) {
                 break
             }
         }
-        if (((Get-Date) - $DismStartTime).TotalMinutes -lt $DismWaitTimeInMinutes){
+        if (((Get-Date) - $DismStartTime).TotalMinutes -lt $DismTimeout){
             Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
         }
     }
@@ -425,7 +451,5 @@ Write-Host "This script can be run again, and again to free up more space." -For
 Write-Host "Script finished`t`t`t`t`t`t`t`t`t`t`t`t" -ForegroundColor Green -NoNewline
 Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 Write-Host "`n"
-
-
 
 
