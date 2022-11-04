@@ -125,6 +125,9 @@ $header = "
 </style>
 
 ”
+# Added output to PowerShell to show processing.
+Write-Host "----------"
+Write-Host "Processing Request"
 
 # Parameters
 $DC = Get-ADDomain | Select-Object DistinguishedName
@@ -304,8 +307,8 @@ $Report = ConvertTo-Html -Body "$PageTitle
           });
         }
         </script><p id='CreationDate'>Creation Date: $(Get-Date)</p>"
-$Report | Out-File -FilePath .\AD-XA-RDS-Groups-Count-Report.html
-Invoke-Expression .\AD-XA-RDS-Groups-Count-Report.html
+$Report | Out-File -FilePath c:\temp\AD-XA-RDS-Groups-Count-Report.html
+Invoke-Expression c:\temp\AD-XA-RDS-Groups-Count-Report.html
 
 
 # Clears the Variables, this stops any issue with the variables bring back any previous held information
