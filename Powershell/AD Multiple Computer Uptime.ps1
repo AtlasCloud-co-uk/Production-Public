@@ -121,8 +121,8 @@ $BootList = $null
 $htmlreport1 = $OutputLoop | Convertto-html  -Property @{ l="Uptime of $DaysUp days or greater"; e={ $_ } } -Fragment -PreContent "<h1>Computers</h1>"
 $htmlreport2 = $errs | ConvertTo-Html -Property @{ l='Exception Message'; e={ $_ } } -Fragment -PreContent "<h2>Skipped Machines Due to Errors</h2>"
 $report = convertto-html -Body "$htmlreport1 $htmlreport2" -Title "ADComputerUpTime" -Head $header -PostContent "<p id='CreationDate'>Creation Date: $(Get-Date -Format dd/MM/yy)</p>"
-$report | out-file .\ADComputerUpTime.html
-Invoke-Expression .\ADComputerUpTime.html
+$report | out-file c:\temp\ADComputerUpTime.html
+Invoke-Expression c:\temp\ADComputerUpTime.html
 
 # Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue
