@@ -125,6 +125,9 @@ $header = "
 </style>
 
 ”
+# Output to PowerShell to show running
+Write-Host "----------"
+Write-Host "Processing Request"
 
 # Parameters
 $DC = Get-ADDomain | Select-Object DistinguishedName
