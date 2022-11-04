@@ -313,7 +313,7 @@ $LoginOver90days
 $ListCompanyOver90daysCount = $ListCompanyOver90days | Measure
 $ListCompanyOver90daysHTML = $ListCompanyOver90days| ConvertTo-Html
 $ListCompanyOver90daysButton = "<h2>List Enabled Users by Company that have either:<br>Never Logged in or Not Logged in for Over 90 days: <h4>$($ListCompanyOver90daysCount.Count)</h4> </h2><button type='button' class='collapsible'><h3>+</h3></button> <div class='content'> <p class='a'>*Table automatically exported to CompanyOver90days.csv in the same location as shown in the URL</p><p>$ListCompanyOver90daysHTML</p> </div>"
-
+$ListcompanyOver90daysCSV = $ListCompanyOver90days | Export-Csv -Path c:\temp\CompanyOver90days.csv 
 
 
 
