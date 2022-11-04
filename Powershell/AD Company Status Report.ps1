@@ -302,7 +302,7 @@ $obj3
 })
 $ListCompanyHTML = $Listcompany | ConvertTo-Html
 $ListCompanyButton = "<h2>List Logged In by Company:  </h2><button type='button' class='collapsible'><h3>+</h3></button> <div class='content'><p class='a'>*Table automatically exported to Company30-90logon.csv in the same location as shown in the URL</p> <p>$ListCompanyHTML</p> </div>"
-$ListcompanyCSV = $Listcompany | Export-Csv -Path .\Company30-90logon.csv 
+$ListcompanyCSV = $Listcompany | Export-Csv -Path c:\temp\Company30-90logon.csv 
 
 #Company Users Not logged on for over 90days and Null per Company
 
@@ -346,8 +346,8 @@ $Report = ConvertTo-Html -Body "$PageTitle
           });
         }
         </script><p id='CreationDate'>Creation Date: $(Get-Date)</p>"
-$Report | Out-File -FilePath .\AD-Company-Status-Report.html
-Invoke-Expression .\AD-Company-Status-Report.html
+$Report | Out-File -FilePath c:\temp\AD-Company-Status-Report.html
+Invoke-Expression c:\temp\AD-Company-Status-Report.html
 
 # Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue
