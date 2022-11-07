@@ -253,8 +253,8 @@ $Report = ConvertTo-Html -Body "$PageTitle
           });
         }
         </script><p id='CreationDate'>Creation Date: $(Get-Date)</p>"
-$Report | Out-File -FilePath .\Software-List-Report.html
-Invoke-Expression .\Software-List-Report.html
+$Report | Out-File -FilePath c:\temp\Software-List-Report.html
+Invoke-Expression c:\temp\Software-List-Report.html
 
 
 
@@ -281,13 +281,13 @@ elseif ($ExporToCSV -eq "N") {
 elseif ($ExporToCSV -eq "Y") {
       
         $CSVName = Read-Host -Prompt "Supply CSV name"
-        $Installed | select ComputerName, DisplayName, DisplayVersion, BitVersion | Export-Csv -append -path .\$($CSVName).csv
+        $Installed | select ComputerName, DisplayName, DisplayVersion, BitVersion | Export-Csv -append -path c:\temp\$($CSVName).csv
         Remove-Variable * -ErrorAction SilentlyContinue
         }
        
 elseif ($ExporToCSV -eq "Yes") {
         $CSVName = Read-Host -Prompt "Supply CSV name"
-        $Installed| select ComputerName, DisplayName, DisplayVersion, BitVersion | Export-Csv -append -path .\$($CSVName).csv
+        $Installed| select ComputerName, DisplayName, DisplayVersion, BitVersion | Export-Csv -append -path c:\temp\$($CSVName).csv
         Remove-Variable * -ErrorAction SilentlyContinue
         }
 
