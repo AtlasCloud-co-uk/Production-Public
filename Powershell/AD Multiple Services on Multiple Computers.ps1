@@ -139,8 +139,8 @@ $htmlreport1 = $htmlreport1 -replace '<td>Running</td>','<td class="RunningStatu
 $htmlreport1 = $htmlreport1 -replace '<td>Stopped</td>','<td class="StopStatus">Stopped</td>'
 $htmlreport2 = $errs | ConvertTo-Html -Property @{ l='Exception Message'; e={ $_ } } -Fragment -PreContent "<h2>Skipped Machines Due to Errors</h2>"
 $report = convertto-html -Body "$htmlreport1 $htmlreport2" -Title "ADMultipleServicesMachines" -Head $header -PostContent "<p id='CreationDate'>Creation Date: $(Get-Date -Format dd/MM/yy)</p>"
-$report | out-file .\ADMultipleServicesMachines.html
-Invoke-Expression .\ADMultipleServicesMachines.html
+$report | out-file c:\temp\ADMultipleServicesMachines.html
+Invoke-Expression c:\temp\ADMultipleServicesMachines.html
 
 # Clears the Variables, this stops any issue with the variables bring back any previous held information
 Remove-Variable * -ErrorAction SilentlyContinue
