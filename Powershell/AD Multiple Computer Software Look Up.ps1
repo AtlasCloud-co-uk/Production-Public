@@ -124,7 +124,7 @@ $header = "
 
 </style>
 
-‚Äù
+î
 
 # Page Title
 
@@ -155,27 +155,27 @@ $mutli = foreach($comp in $ComputerSelect){
 $list=@()
 foreach ($InstalledSoftwareKey in $InstalledSoftwareKeyArray){
     Try{
-        $InstalledSoftware=[microsoft.win32.registrykey]::OpenRemoteBaseKey(‚ÄòLocalMachine‚Äô,$Comp.Name)
+        $InstalledSoftware=[microsoft.win32.registrykey]::OpenRemoteBaseKey(ëLocalMachineí,$Comp.Name)
         $RegistryKey=$InstalledSoftware.OpenSubKey($InstalledSoftwareKey)
         $SubKeys=$RegistryKey.GetSubKeyNames()
               Foreach ($key in $SubKeys){
-                $thisKey=$InstalledSoftwareKey+‚Äù\\‚Äù+$key
+                $thisKey=$InstalledSoftwareKey+î\\î+$key
                 $thisSubKey=$InstalledSoftware.OpenSubKey($thisKey) 
                 $object = New-Object PSObject -Property @{
                 ComputerName = $Comp.Name
-                DisplayName = $($thisSubKey.GetValue(‚ÄúDisplayName‚Äù))
-                DisplayVersion = $($thisSubKey.GetValue(‚ÄúDisplayVersion‚Äù))
+                DisplayName = $($thisSubKey.GetValue(ìDisplayNameî))
+                DisplayVersion = $($thisSubKey.GetValue(ìDisplayVersionî))
                 BitVersion = $InstalledSoftwareKey
                 }
                 $object
                 }
-                if($object | select ComputerName, DisplayName, DisplayVersion, BitVersion | Where {$_.DisplayName -like ‚Äú*$($SoftwareName)*‚Äù}){
-                $object| select ComputerName, DisplayName, DisplayVersion, BitVersion | Where {$_.DisplayName -like ‚Äú*$($SoftwareName)*‚Äù}}
+                if($object | select ComputerName, DisplayName, DisplayVersion, BitVersion | Where {$_.DisplayName -like ì*$($SoftwareName)*î}){
+                $object| select ComputerName, DisplayName, DisplayVersion, BitVersion | Where {$_.DisplayName -like ì*$($SoftwareName)*î}}
                 
                 
        else{
                 $obj2 = New-Object PSObject
-                $obj2 | Add-Member -MemberType NoteProperty -Name ‚ÄúComputerName‚Äù -Value $Comp.Name
+                $obj2 | Add-Member -MemberType NoteProperty -Name ìComputerNameî -Value $Comp.Name
                 $CaptureList += $obj2
                 }
         }
@@ -187,7 +187,7 @@ foreach ($InstalledSoftwareKey in $InstalledSoftwareKeyArray){
        }
 
 # Show Installed    
-$Installed = $mutli | Where {$_.ComputerName -ne $null -and $_.DisplayName -ne $null -and $_.DisplayName -like ‚Äú*$($SoftwareName)*‚Äù -and $_.DisplayVersion -ne $Null } | Sort-Object -Property ComputerName,DisplayName 
+$Installed = $mutli | Where {$_.ComputerName -ne $null -and $_.DisplayName -ne $null -and $_.DisplayName -like ì*$($SoftwareName)*î -and $_.DisplayVersion -ne $Null } | Sort-Object -Property ComputerName,DisplayName 
 # -Unique
 
 # Count Installed
