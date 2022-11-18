@@ -1,4 +1,19 @@
+#############################################################################
+#If Powershell is running the 32-bit version on a 64-bit machine, we 
+#need to force powershell to run in 64-bit mode .
+#############################################################################
+if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
+    write-warning "Opening 64-bit powershell....."
+    if ($myInvocation.Line) {
+        &"$env:WINDIR\sysnative\windowspowershell\v1.0\powershell.exe" -NoProfile $myInvocation.Line
+    }else{
+        &"$env:WINDIR\sysnative\windowspowershell\v1.0\powershell.exe" -NoProfile -file "$($myInvocation.InvocationName)" $args
+    }
+exit $lastexitcode
+}
 
+function Start-Cleanup {
+    
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false,ValueFromPipelineByPropertyName)]
@@ -452,4 +467,166 @@ Write-Host "Script finished`t`t`t`t`t`t`t`t`t`t`t`t" -ForegroundColor Green -NoN
 Write-Host "[DONE]" -ForegroundColor Green -BackgroundColor Black
 Write-Host "`n"
 
+# Clears the Variables, this stops any issue with the variables bring back any previous held information
+Remove-Variable * -ErrorAction SilentlyContinue
+}
 
+
+###### start of pre-run steps
+
+
+function New-Cleanup {
+	$CleanmgrTimeoutOption = "5" # default value
+	$DismTimeoutOption = "5" # default value
+	$DismAdvancedOption = 0 # default value
+
+	function Start-CleanupOptions {
+		$Global:RunCommand = Get-CurrentRunCommand # Evaluate current run command
+		Write-Host "Running '$RunCommand'"
+		if ($RunAgainstLocalPC){
+			Start-Cleanup -CleanmgrTimeout $CleanmgrTimeoutOption -DismTimeout $DismTimeoutOption -DismAdvanced:$DismAdvancedOption
+		} else {
+			Invoke-Command -ComputerName $RemoteComputerName -Credential $RemoteCredentials -ScriptBlock ${function:Start-Cleanup} -ArgumentList $CleanmgrTimeoutOption, $DismTimeoutOption, $DismAdvancedOption
+			#Invoke-Command -ComputerName $RemoteComputerName -Credential $RemoteCredentials -ArgumentList $CleanmgrTimeoutOption, $DismTimeoutOption, $DismAdvancedOption
+		}
+	}
+
+	function Get-CurrentRunCommand { # Just cosmetic
+		if ($RunAgainstLocalPC){
+			$Command = "Start-Cleanup -CleanmgrTimeout $CleanmgrTimeoutOption -DismTimeout $DismTimeoutOption -DismAdvanced:$DismAdvancedOption"
+		} else {
+			$Command = "Invoke-Command -ComputerName $RemoteComputerName -Credential `$RemoteCredentials -ScriptBlock `${function:Start-Cleanup} -ArgumentList -CleanmgrTimeout $CleanmgrTimeoutOption, -DismTimeout $DismTimeoutOption, -DismAdvanced:$DismAdvancedOption"
+		}
+		return $Command
+	}
+
+	function Show-AdvancedMenu {
+		$Global:RunCommand = Get-CurrentRunCommand # Evaluate current run command
+		# Advanced options -- menu
+		$ScriptSetup04 = @"
+What do you want to change?
+[1] Cleanmgr timeout period -- Currently set to $CleanmgrTimeoutOption mins
+[2] Dism timeout period -- Currently set to $DismTimeoutOption mins
+[3] Advanced Dism cleanup -- Currently set to $([bool]$DismAdvancedOption)
+[4] Run script below
+
+Built command:`t'$Global:RunCommand'
+
+Type a number and press enter
+"@
+
+		$DismAdvancedOptionPrompt = @"
+Info
+- If disabled:	Frees up less space; safer
+- If enabled:	Frees up more space; currently installed updates can't be removed
+
+[1] Disabled -- default
+[2] Enabled
+
+Type a number and press enter
+"@
+		$ScriptSetup04Response = Read-Host -Prompt $ScriptSetup04
+		switch ($ScriptSetup04Response) {
+			"1" {	$CleanmgrTimeoutOption = Read-Host -Prompt "`nEnter the new Cleanmgr timeout value (in mins)"; cls; Show-AdvancedMenu }
+			"2" {	$DismTimeoutOption = Read-Host -Prompt "`nEnter the new Dism timeout value (in mins)"; cls; Show-AdvancedMenu }
+			"3" {	cls; $DismAdvancedOption = Read-Host -Prompt $DismAdvancedOptionPrompt
+					switch ($DismAdvancedOption) {
+						"1" { $DismAdvancedOption = 0 }
+						"2" { $DismAdvancedOption = 1 }
+						Default { $DismAdvancedOption = 0 }
+					}
+					cls
+					Show-AdvancedMenu}
+			"4" {	cls; Start-CleanupOptions }
+			Default {cls; Show-AdvancedMenu}
+		}
+	}
+
+	function Show-AskIfLocalOrRemotePC {
+
+		# Run script locally or remotely?
+		$AskIfLocalOrRemotePC = @"
+How do you want to run this script?
+[1] Locally on this computer
+[2] Choose from Active Directory
+[3] Against a remote computer (Manually type the name)
+
+Type a number and press enter
+"@
+		cls
+		$AskIfLocalOrRemotePCResponse = Read-Host -Prompt $AskIfLocalOrRemotePC
+		switch ($AskIfLocalOrRemotePCResponse) {
+			"1" { $Global:RunAgainstLocalPC = $true; cls }
+			"2" { $Global:RunAgainstLocalPC = $false; cls }
+			"3" { $Global:RunAgainstLocalPC = $false; cls }
+			Default {Write-Host "One of the listed numbers was not entered";exit}
+		}
+
+		if ($AskIfLocalOrRemotePCResponse -eq "2"){# Select from AD
+			$ComputerList = Get-ADComputer -Filter * -Properties Name,DistinguishedName | Sort-Object | Select-Object -Property Name,DistinguishedName
+			$ComputerSelect = $ComputerList | Out-GridView -Title "Select Computer Name and Click OK" -OutputMode Single
+			$Global:RemoteComputerName = $ComputerSelect.Name
+			cls
+	
+				# Do we need to specify alternative credentials
+				$ScriptSetup02 = @"
+Do you need to specify alternative credentials to run the script as?
+[1] No -- connect with $Global:RemoteComputerName\Administrator
+[2] Yes
+
+Type a number and press enter
+"@
+	
+			$ScriptSetup02Response = Read-Host -Prompt $ScriptSetup02
+				switch ($ScriptSetup02Response) {
+					"1" { $Global:RemoteCredentials = Get-Credential -UserName "$RemoteComputerName\Administrator" -Message "Enter the local administrator password for $Global:RemoteComputerName"; cls }
+					"2" { $Global:RemoteCredentials = Get-Credential; cls }
+					Default {Write-Host "One of the listed numbers was not entered";break}
+				}
+			}
+
+		if ($AskIfLocalOrRemotePCResponse -eq "3"){ # Manually type remote pc name
+			$Global:RemoteComputerName = Read-Host -Prompt "Enter the remote computer name"
+			cls
+
+			# Do we need to specify alternative credentials
+			$ScriptSetup02 = @"
+Do you need to specify alternative credentials to run the script as?
+[1] No -- connect with $Global:RemoteComputerName\Administrator
+[2] Yes
+
+Type a number and press enter
+"@
+
+		$ScriptSetup02Response = Read-Host -Prompt $ScriptSetup02
+			switch ($ScriptSetup02Response) {
+				"1" { $Global:RemoteCredentials = Get-Credential -UserName "$RemoteComputerName\Administrator" -Message "Enter the local administrator password for $Global:RemoteComputerName"; cls }
+				"2" { $Global:RemoteCredentials = Get-Credential; cls }
+				Default {Write-Host "One of the listed numbers was not entered";break}
+			}
+		}
+		
+	}
+
+	function Show-AskIfAdvancedMenuNeeded {
+		$Global:RunCommand = Get-CurrentRunCommand # Evaluate current run command
+		# Advanced options?
+		$AskIfAdvancedMenuNeeded = @"
+Do you need to specify advanced options?
+[1] No -- defaults
+[2] Yes
+
+Type a number and press enter
+"@
+		$AskIfAdvancedMenuNeededResponse = Read-Host -Prompt $AskIfAdvancedMenuNeeded
+		switch ($AskIfAdvancedMenuNeededResponse) {
+			"1" { cls; Start-CleanupOptions }
+			"2" { cls; Show-AdvancedMenu }
+			Default {Write-Host "One of the listed numbers was not entered";break}
+		}
+	}
+	Show-AskIfLocalOrRemotePC
+	Show-AskIfAdvancedMenuNeeded
+}
+
+New-Cleanup
