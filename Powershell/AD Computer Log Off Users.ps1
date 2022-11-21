@@ -86,7 +86,7 @@ $ListSessionsActive = $Global:UserInfo | Where {$_.SessionState -like 'Active'} 
 $listSessionsActiveRDP = $Global:UserInfo | Where {($_.SessionState -like 'Active') -and ($_.SessionName -like '*rdp*') } | Select-Object -Property Username,SessionID,SessionName
 
 # Add Logoff Arguement for server and supplied servername. 
-$Contcat = "/server:" + $ComputerSelect.Name 
+$Contcat = "/server:" + $ComputerSelect.Name
 
 # Function to supply menu and check if session is avaiable and log off users
 function Show-LogOffOptions { try
@@ -97,7 +97,8 @@ function Show-LogOffOptions { try
     [2] Logoff RDP Active User/s
     [3] Logoff All Active User/s
     [4] Logoff All User/s
-    [5] Quit
+    [5] Check if there are any user/s sessions.
+    [6] Quit
 
     Type a number and press enter 
 "@
@@ -106,17 +107,25 @@ function Show-LogOffOptions { try
 		    switch ($AskLofOffOptions) {
 		        "1" { if ($ListSessionsDisconnected.SessionID -eq $Null) {Write-host "No User/s Found `n" -ForegroundColor Red -NoNewline;Show-LogOffOptions}
                         else{ 
-                            logoff $ListSessionsDisconnected.SessionID $Contcat }}
+                            logoff $ListSessionsDisconnected.SessionID $Contcat ; write-host "User/s Logged Off `n" -ForegroundColor Green }}
                 "2" { if ($listSessionsActiveRDP.SessionID -eq $Null) {Write-host "No User/s Found `n" -ForegroundColor Red -NoNewline;Show-LogOffOptions}
                         else{ 
-                            logoff $listSessionsActiveRDP.SessionID $Contcat }}
+                            logoff $listSessionsActiveRDP.SessionID $Contcat ; write-host "User/s Logged Off `n" -ForegroundColor Green }}
 		    	"3" { if ($ListSessionsActive.SessionID -eq $Null) {Write-host "No User/s Found `n" -ForegroundColor Red -NoNewline;Show-LogOffOptions}
                         else{
-                        logoff $ListSessionsActive.SessionID $Contcat }}
+                        logoff $ListSessionsActive.SessionID $Contcat ; write-host "User/s Logged Off `n" -ForegroundColor Green }}
                 "4" { if (($ListSessionsActive.SessionID -eq $Null) -and ($ListSessionsDisconnected.SessionID -eq $Null)) {Write-host "No User/s Found `n" -ForegroundColor Red -NoNewline;Show-LogOffOptions}
+                        
+                            elseif ($ListSessionsDisconnected.SessionID -ne $null)
+                            {logoff $ListSessionsDisconnected.SessionID $Contcat ; write-host "User/s Logged Off `n" -ForegroundColor Green}
+                            elseif ($ListSessionsActive.SessionID -ne $null)
+                            {logoff $ListSessionsActive.SessionID $Contcat ; write-host "User/s Logged Off `n" -ForegroundColor Green}
+                           else {Write-host "No User/s Found `n" -ForegroundColor Red -NoNewline;Show-LogOffOptions}
+                           }
+                "5" { if (($ListSessionsActive.SessionID -eq $Null) -and ($ListSessionsDisconnected.SessionID -eq $Null)) {Write-host "No User/s Found `n" -ForegroundColor Red -NoNewline;Show-LogOffOptions}
                         else{
-                        logoff $ListSessionsDisconnected.SessionID $Contcat ; logoff $ListSessionsActive.SessionID $Contcat }}
-                "5" { break }
+                        Get-LoggedInUser;Show-LogOffOptions}}
+                "6" { break }
 
 		    	Default {Write-Host "One of the listed numbers was not entered";Show-LogOffOptions}
 		    }
