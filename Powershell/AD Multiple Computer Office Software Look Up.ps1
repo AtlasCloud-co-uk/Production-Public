@@ -127,7 +127,7 @@ $header = "
 ”
 
 # Page Title
-$PageTitle = "<h1>Software List Report</h1>"
+$PageTitle = "<h1>Office, Visio and Project Software List Report</h1>"
 
 # Note
 $Note = "<p class='a'>This information is taken from the Registry and may look to show duplicate values but is correct</p>"
