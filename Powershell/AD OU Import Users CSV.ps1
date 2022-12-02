@@ -36,16 +36,16 @@ foreach ($User in $ADUsers)
 	$Password 	= $User.password
 	$Firstname 	= $User.firstname
 	$Lastname 	= $User.lastname
-    $Domain     = $User.Domain
+    	$Domain     = $User.Domain
 	$email      = $User.email
-    $streetaddress = $User.streetaddress
-    $city       = $User.city
-    $PostalCode = $User.postalcode
-    $telephone  = $User.telephone
-    $jobtitle   = $User.jobtitle
-    $company    = $User.company
-    $department = $User.department
-    
+    	$streetaddress = $User.streetaddress
+    	$city       = $User.city
+    	$PostalCode = $User.postalcode
+   	$telephone  = $User.telephone
+    	$jobtitle   = $User.jobtitle
+    	$company    = $User.company
+    	$department = $User.department
+    	$extensionAttribute2 = $User.extensionAttribute2
 
 
 	# Check to see if the user already exists in AD
@@ -77,7 +77,7 @@ foreach ($User in $ADUsers)
             -Title $jobtitle `
             -Department $department `
             -AccountPassword (convertto-securestring $Password -AsPlainText -Force) -ChangePasswordAtLogon $True
-            
+            -extensionAttribute2 $extensionAttribute2
 	}
 }
 
