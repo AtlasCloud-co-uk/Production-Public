@@ -1,4 +1,4 @@
-﻿## Param ##
+## Param ##
 
 # Import OU Filter
 $OUFilterListImport = Import-Csv -Path "C:\PowerShell Scripts\CSV\ADDisableOUFilter.csv"
