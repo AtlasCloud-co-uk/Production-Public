@@ -285,7 +285,7 @@ $Report = ConvertTo-Html -Body "$PageTitle
         }
         </script><p id='CreationDate'>Creation Date: $(Get-Date)</p>"
 $Report | Out-File -FilePath c:\temp\Software-Office-List-Report.html
-Invoke-Expression c:\temp\Software-List-Report.html
+Invoke-Expression c:\temp\Software-Office-List-Report.html
 
 # Confirmation to Proceed for CSV export
 $ExporToCSV = Read-Host -Prompt "Export to CSV"
