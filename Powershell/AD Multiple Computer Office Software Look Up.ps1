@@ -282,7 +282,7 @@ $ListNotInstalledHTML = $ListNotInstalled | Sort-Object -Property InputObject  |
 $ListNotInstalledButton = "<h2>Software Not Installed On Total:<pd>$($TotalCountListNotInstalledHTML)</pd></h2><button type='button' class='collapsible'><h3>+</h3></button> <div class='content'><p>$ListNotInstalledHTML</p></div>"
 
 
-# Convert to CSV
+# Convert to HTML
 $Report = ConvertTo-Html -Body "$PageTitle
  $SoftwareRequest<p></p>
  $InstalledButton<p></p>
