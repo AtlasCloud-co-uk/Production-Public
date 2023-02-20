@@ -36,7 +36,7 @@ $tbl.Columns.Add($col4)
 Connect-MsolService
 
 # Get Tenants List
-$TenantsListSelect = Get-MsolPartnerContract | Sort-object Name | Select-Object Name,TenantID | Out-GridView "Select Partner Site and Click OK" -OutputMode Single
+$TenantsListSelect = Get-MsolPartnerContract | Sort-object Name | Select-Object Name,TenantID | Out-GridView -Title "Select Partner Site and Click OK" -OutputMode Single
 
 # Get Azure AD Groups
 $AzGroupListSelect = Get-MsolGroup -TenantID $TenantsListSelect.TenantId | Sort-Object DisplayName | Select-Object DisplayName,ObjectId | Out-GridView -Title "Select AD Group/s and Click OK" -PassThru
