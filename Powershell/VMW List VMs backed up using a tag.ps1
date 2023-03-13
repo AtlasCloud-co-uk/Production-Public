@@ -70,6 +70,7 @@ do {
 
 if ($option -eq 1) {
     $result | Out-GridView
+    Read-Host "Press Enter to close the window"
 }
 elseif ($option -eq 2) {
     Add-Type -AssemblyName System.Windows.Forms
