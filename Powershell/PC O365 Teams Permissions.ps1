@@ -59,4 +59,4 @@ $tbl | Out-GridView -Title "Team Names and Members"
 Get-PSSession | Remove-PSSession
 
 # Clears the Variables, this stops any issue with the variables bring back any previous held information
-#Remove-Variable * -ErrorAction SilentlyContinue
+Remove-Variable * -ErrorAction SilentlyContinue
