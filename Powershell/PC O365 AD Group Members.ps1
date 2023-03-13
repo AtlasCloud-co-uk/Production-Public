@@ -56,7 +56,7 @@ foreach ($AzGroupSelect in $AzGroupListSelect) {
     } 
 }
 
-$tbl | Out-GridView -Title "AD Groups" 
+$tbl | Out-GridView -Title "AD Groups" -OutputMode Single
 
 # Close Connection
 Get-PSSession | Remove-PSSession
