@@ -53,7 +53,7 @@ $Output = foreach ($TGroup in $TGroups)
 
 }
 
-$tbl | Out-GridView -Title "Team Names and Members"
+$tbl | Out-GridView -Title "Team Names and Members" -OutputMode Single
 
 # Close Connection
 Get-PSSession | Remove-PSSession
