@@ -229,21 +229,6 @@ $UserListOT = $UserListRDS + $UserListXA
 
 $UserListCountOT = $UserListOT | measure
 
-<#
-# Gets a list of Groups
-$GroupListOT = Get-ADGroup -Filter * -Properties Name,DistinguishedName | Where {($_.Name -like "*_XA_Users") -or ($_.Name -like "*RDS")} | Sort-Object  | Select-Object -Property Name,DistinguishedName
-
-
-# Gets the AD Group members SamAccoountName as per the Group selected
-$UserListOT = foreach ($GroupOT in $GroupListOT){
-    $ListUsersOT = Get-ADGroupMember -identity $GroupOT.Name | Select-Object -Property SamAccountName
-        foreach ($ADUserOT in $ListUsersOT){
-            $ListOT = Get-Aduser -Identity $ADUserOT.SamAccountName -Properties name,company,extensionAttribute2 | Where {$_.Enabled -eq 1} | Select-Object -Property extensionAttribute2,name,SamAccountName,company
-            $ListOT           
-            }
-}
-#>
-
 # Get List of AD Users
 $OUlistOT = get-aduser -filter {Enabled -eq $True} -SearchBase $DC.DistinguishedName | Get-AdUser | Select-Object -Property SamAccountName
 

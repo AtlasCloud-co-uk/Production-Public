@@ -39,7 +39,7 @@ Get-EXOMailboxStatistics $MailboxSelect.DisplayName | sort-object User | Select-
 }
 
 # Outout details to GridView
-$Output | Sort-Object Displayname | Out-GridView -Title "Mailbox Size List"
+$Output | Sort-Object Displayname | Out-GridView -Title "Mailbox Size List" -OutputMode Single
 
 # Close Connection
 Get-PSSession | Remove-PSSession

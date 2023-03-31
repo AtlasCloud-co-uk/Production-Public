@@ -1,4 +1,4 @@
-﻿#############################################################################
+#############################################################################
 #If Powershell is running the 32-bit version on a 64-bit machine, we 
 #need to force powershell to run in 64-bit mode .
 #############################################################################
@@ -14,7 +14,7 @@ exit $lastexitcode
 
 
 write-host "Starting Main script body"
-
+ 
 #############################################################################
 #End
 #############################################################################  
@@ -53,10 +53,10 @@ $Output = foreach ($TGroup in $TGroups)
 
 }
 
-$tbl | Out-GridView -Title "Team Names and Members"
+$tbl | Out-GridView -Title "Team Names and Members" -OutputMode Single
 
 # Close Connection
 Get-PSSession | Remove-PSSession
 
 # Clears the Variables, this stops any issue with the variables bring back any previous held information
-#Remove-Variable * -ErrorAction SilentlyContinue
+Remove-Variable * -ErrorAction SilentlyContinue

@@ -35,10 +35,10 @@ $tbl.Columns.Add($col4)
 Connect-MsolService
 
 # Get Tenants List
-$TenantsListSelect = Get-MsolPartnerContract | Sort-object Name | Select-Object Name,TenantID | Out-GridView -PassThru
+$TenantsListSelect = Get-MsolPartnerContract | Sort-object Name | Select-Object Name,TenantID | Out-GridView -Title "Select Partner Site and Click OK" -PassThru
 
 # Get Service Plan List
-$ServicePlanListSelect = Get-MsolAccountSku -TenantID $TenantsListSelect.TenantId | Out-GridView -PassThru
+$ServicePlanListSelect = Get-MsolAccountSku -TenantID $TenantsListSelect.TenantId | Out-GridView -Title "Service Plan List" -PassThru
 
 # Gets the information and outputs to Gridview
 $Output = 
