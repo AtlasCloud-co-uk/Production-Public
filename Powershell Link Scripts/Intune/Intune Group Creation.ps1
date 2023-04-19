@@ -1,4 +1,4 @@
-﻿Remove-Module AzureAD -ErrorAction SilentlyContinue
+Remove-Module AzureAD -ErrorAction SilentlyContinue
 Install-Module -Name AzureADPreview -AllowClobber
 Import-Module AzureADPreview
 Connect-AzureAD
