@@ -5,32 +5,78 @@
     Author: Martin Purvis
 #>
 
+#region Variables to change
+$organizationName = 'Atlas Cloud' # String used in the certificate metadata
+$certificatePrefix = 'MGX' # Certificate filename prefix
+$opensslPath = "C:\Program Files\OpenSSL-Win64\bin\openssl.exe" # Define the path to the openssl executable
+$iconPath = "C:\Program Files\PowerShellMenu\public\images\menu.ico" # Define the path to the custom icon
+#endregion
+
 # Load the System.Windows.Forms assembly
 Add-Type -AssemblyName System.Windows.Forms
 
-# Define the path to the openssl executable
-$opensslPath = "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
-
 # Create a new input dialog using System.Windows.Forms
 $form = New-Object System.Windows.Forms.Form
-$form.Text = 'Enter Username'
-$form.Size = New-Object System.Drawing.Size(300,150)
+$form.Text = 'Netscaler Client Certificate Generation'
+$form.Size = New-Object System.Drawing.Size(500,180) # Adjust the size of the form to accommodate the label
 $form.StartPosition = 'CenterScreen'
+$form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle # Disable resizing of the window
+
+# Set the custom icon for the input dialog
+if (Test-Path $iconPath) {
+    $form.Icon = New-Object System.Drawing.Icon($iconPath)
+}
+
+# Create a label to display instructions to the user
+$label = New-Object System.Windows.Forms.Label
+$label.Text = 'Please enter the username of the user who you are creating the certificate for, this script will take care of the rest of the naming.'
+$label.AutoSize = $false
+$label.Width = 460
+$label.Height = 40
+$label.Location = New-Object System.Drawing.Point(15,10)
+$form.Controls.Add($label)
 
 # Create a textbox to enter the username
 $textBox = New-Object System.Windows.Forms.TextBox
-$textBox.Location = New-Object System.Drawing.Point(15,25)
-$textBox.Size = New-Object System.Drawing.Size(250,23)
+$textBox.Location = New-Object System.Drawing.Point(15,60) # Adjust the position of the text box to accommodate the label
+$textBox.Size = New-Object System.Drawing.Size(460,23)
+$textBox.MaxLength = 40  # Set the maximum length for the input to 40 characters
 $form.Controls.Add($textBox)
+
+# Define the set of allowed characters
+$allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-"
+
+# Add an event handler to validate the text box input
+$textBox.add_TextChanged({
+    # Get the current text in the text box
+    $currentText = $textBox.Text
+
+    # Filter out any characters that are not in the allowed set
+    $filteredText = ($currentText.ToCharArray() | Where-Object { $allowedCharacters.Contains($_) }) -join ''
+
+    # Update the text box with the filtered text
+    if ($filteredText -ne $currentText) {
+        $textBox.Text = $filteredText
+
+        # Set the caret position to the end of the text box
+        $textBox.SelectionStart = $filteredText.Length
+    }
+
+    # Enable or disable the OK button based on whether the text box contains only valid characters and is not empty
+    $okButton.Enabled = ($textBox.Text -eq $filteredText) -and ($textBox.Text.Length -gt 0)
+})
 
 # Create an OK button
 $okButton = New-Object System.Windows.Forms.Button
-$okButton.Location = New-Object System.Drawing.Point(95,60)
+$okButton.Location = New-Object System.Drawing.Point(200,100) # Adjust the position of the OK button to center it and place it below the text box
 $okButton.Size = New-Object System.Drawing.Size(100,25)
 $okButton.Text = 'OK'
 $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
 $form.Controls.Add($okButton)
 $form.AcceptButton = $okButton
+
+# Disable the OK button initially
+$okButton.Enabled = $false
 
 # Show the input dialog and get the result
 $result = $form.ShowDialog()
@@ -38,21 +84,28 @@ $result = $form.ShowDialog()
 # If the user clicked OK, set the $subjectName variable
 if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
     $username = $textBox.Text
-    $subjectName = ("MGX-$username--" + (Get-Date -Format 'yyyyMMdd') ) # Define the base name for the certificate, private key, CSR, and PFX files
+    $subjectName = ("$certificatePrefix-$username--" + (Get-Date -Format 'yyyyMMdd') ) # Define the base name for the certificate, private key, CSR, and PFX files
+} else {
+    return
 }
 
-# Create a new folder browser dialog using System.Windows.Forms
-$folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
-$folderBrowser.Description = 'Select the directory where you want to save the files'
-$folderBrowser.SelectedPath = "C:\temp\user" # Set the default folder
-$folderBrowser.RootFolder = [Environment+SpecialFolder]::MyComputer
+# Create a new save file dialog using System.Windows.Forms
+$saveFileDialog = New-Object System.Windows.Forms.SaveFileDialog
+$saveFileDialog.Title = 'Select the file location and name'
+$saveFileDialog.Filter = 'PFX Files (*.pfx)|*.pfx'
+$saveFileDialog.FileName = "$subjectName.pfx" # Set the default file name
+$saveFileDialog.InitialDirectory = 'C:\temp\certs'
 
-# Show the folder browser dialog and get the result
-$folderResult = $folderBrowser.ShowDialog()
+# Show the save file dialog and get the result
+$saveFileResult = $saveFileDialog.ShowDialog()
 
-# If the user clicked OK, set the $outputDirectory variable
-if ($folderResult -eq [System.Windows.Forms.DialogResult]::OK) {
-    $outputDirectory = $folderBrowser.SelectedPath
+# If the user clicked OK, set the $outputDirectory and $pfxFile variables
+if ($saveFileResult -eq [System.Windows.Forms.DialogResult]::OK) {
+    $pfxFile = $saveFileDialog.FileName
+    $outputDirectory = Split-Path $pfxFile -Parent
+} else {
+    # If the user canceled or closed the dialog, exit the script
+    return
 }
 
 # Use the $outputDirectory variable to specify the file paths for the key, CSR, certificate, and PFX files
@@ -65,11 +118,13 @@ $pfxFile = Join-Path $outputDirectory "$subjectName.pfx"
 # Define the desired password for the PFX file
 $pfxPassword = -join (1..32 | ForEach-Object { [char]((97..122) + (65..90) + (48..57) + [char[]]'!#$^*()-_=+[]{}:.<>' | Get-Random) })
 
+Write-Host "Working on $pfxFile"
+
 # Generate a private key and a CSR using openssl
-& $opensslPath req -new -newkey rsa:2048 -nodes -keyout $keyFile -out $csrFile -subj "/C=GB/ST=England/O=AtlasCloud/CN=$subjectName"
+& $opensslPath req -new -newkey rsa:2048 -nodes -keyout $keyFile -out $csrFile -subj "/C=GB/ST=England/O=$organizationName/CN=$subjectName" > $null 2>&1
 Start-Sleep -Seconds 5
 # Submit the CSR to the Microsoft CA using the certreq tool and save the issued certificate
-& certreq -submit -f -attrib "CertificateTemplate:NetscalerClientCert" -config "PUL-CA01.corp.atlascloud.net\corp-FORNAX-CA" $csrFile $cerFile
+& certreq -submit -f -attrib "CertificateTemplate:NetscalerClientCert" -config "PUL-CA01.corp.atlascloud.net\corp-FORNAX-CA" $csrFile $cerFile > $null 2>&1
 
 & $opensslPath pkcs12 -export -out $pfxFile -inkey $keyFile -in $cerFile -password pass:$pfxPassword
 Start-Sleep -Seconds 2
