@@ -1,4 +1,4 @@
-﻿# Folder Name Variable
+# Folder Name Variable
 $Folder = 'c:\hwid'
 
 #Message OutPut
