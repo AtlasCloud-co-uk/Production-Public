@@ -1,4 +1,4 @@
-﻿# Imports the Server names
+# Imports the Server names
 $VSphereServerImport = Import-Csv -Path "C:\Powershell Scripts\CSV\VMServers.csv"
 
 # Connect to the VMWare server and pulls back the snapsots into a grid-view
