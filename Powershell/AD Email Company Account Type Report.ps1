@@ -1,4 +1,4 @@
-﻿# Email Parameters Import
+# Email Parameters Import
 $EmailImport = Import-Csv -Path "C:\Powershell Scripts\CSV\EmailParameters.csv"
 
 # Email Parameters
