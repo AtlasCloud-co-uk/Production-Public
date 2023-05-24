@@ -31,7 +31,7 @@ $metadataCategoryName = "Veeam Backup Job Name"
 
 $result = foreach($vm in $allVMs){
 
-    $tagAssignments = Get-TagAssignment -Entity (Get-VIObjectByVIView -VIView $vm) -Category $metadataCategoryName
+    $tagAssignments = Get-VM -Name $vm.Name -ErrorAction SilentlyContinue | Get-TagAssignment -Category $metadataCategoryName
 
     if ($tagAssignments.Count -le 1)
     {   
