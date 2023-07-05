@@ -1,4 +1,5 @@
-﻿# HTML Code
+
+# HTML Code
 
 $header = "
 
