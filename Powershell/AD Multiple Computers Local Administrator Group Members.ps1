@@ -37,7 +37,7 @@ write-host "Server not accessiable $($Comp.name)" -ForegroundColor Cyan
 }
 catch [System.Management.Automation.RemoteException]
 {
-write-host "Check Server for Orphan Accounts or ignore if AG or Listner $($Comp.name)" -ForegroundColor Green
+write-host "Check Server for Orphan Accounts or PS 4.0 or ignore if AG, Listner or Domain Controller $($Comp.name)" -ForegroundColor Green
 }
 catch{
 Write-Warning $Error[0]
