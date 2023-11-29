@@ -180,7 +180,7 @@ $ReportDiffConHTML = $ReportDiff | ConvertTo-Html
 $ReportDiffHTML ="<h2>User/s last logged on.</h2><p>$ReportDiffConHTML</p>"
 
 # Get AD Users from Specific OU where Last Logon Is Empty
-$ADUsersEmpty = Get-ADUser -SearchBase "OU=Users,OU=External Third Party Support Users,OU=Users,OU=Customers,DC=corp,DC=atlascloud,DC=net" -filter * -Properties "LastLogonDate","Created" | Where {$_.LastLogonDate -eq $null} | select name, Created
+$ADUsersEmpty = Get-ADUser -SearchBase $ADOU.OU -filter * -Properties "LastLogonDate","Created" | Where {$_.LastLogonDate -eq $null} | select name, Created
 
 $ADUsersEmptyConHTML = $ADUsersEmpty | ConvertTo-Html
 
