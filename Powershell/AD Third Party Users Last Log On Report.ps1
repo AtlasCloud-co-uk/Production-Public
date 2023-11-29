@@ -1,4 +1,4 @@
-
+﻿
 #############################################################################
 #If Powershell is running the 32-bit version on a 64-bit machine, we 
 #need to force powershell to run in 64-bit mode .
@@ -182,7 +182,21 @@ $ReportDiffHTML ="<h2>User/s last logged on.</h2><p>$ReportDiffConHTML</p>"
 # Get AD Users from Specific OU where Last Logon Is Empty
 $ADUsersEmpty = Get-ADUser -SearchBase $ADOU.OU -filter * -Properties "LastLogonDate","Created" | Where {$_.LastLogonDate -eq $null} | select name, Created
 
-$ADUsersEmptyConHTML = $ADUsersEmpty | ConvertTo-Html
+# Get difference between last log-on and todays date.
+$DifferenceEmpty = foreach ($ADUserEmpty in $ADUsersEmpty)
+ {$daysempty = if ($ADUserEmpty.Created) {New-TimeSpan -Start $ADUserEmpty.Created -end $Date}
+ $objectempty = New-Object PSObject -Property @{
+                Name = $ADUserEmpty.Name
+                Days = $daysempty.Days
+                Created = $ADUserEmpty.Created
+                }
+                $objectempty
+ }
+
+# Display User and Last Log On Date in Days in Descending Order
+$ReportDiffEmpty = $DifferenceEmpty | Sort-Object -Property Days -Descending
+
+$ADUsersEmptyConHTML = $ReportDiffEmpty | ConvertTo-Html
 
 $ADUsersEmptyHTML = "<h2>User/s has never logged-on.</h2><p>$ADUsersEmptyConHTML</p>"
 
