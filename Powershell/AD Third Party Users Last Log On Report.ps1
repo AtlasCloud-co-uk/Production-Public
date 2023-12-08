@@ -200,7 +200,7 @@ $ADUsersEmptyConHTML = $ReportDiffEmpty | ConvertTo-Html
 
 $ADUsersEmptyHTML = "<h2>User/s has never logged-on.</h2><p>$ADUsersEmptyConHTML</p>"
 
-# Convert to CSV
+# Convert to HTML
 $Report = ConvertTo-Html -Body "$PageTitle
  $ReportDiffHTML<p></p>
  $ADUsersEmptyHTML<p></p>
@@ -226,4 +226,4 @@ Invoke-Expression c:\temp\Third-Party-Report.html
 
 
 #Clears the Variables, this stops any issue with the variables bring back any previous held information
-#Remove-Variable * -ErrorAction SilentlyContinue
+Remove-Variable * -ErrorAction SilentlyContinue
